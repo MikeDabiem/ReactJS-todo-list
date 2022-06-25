@@ -20,6 +20,13 @@ const TodoList: React.FC<toDos> = (props: toDos) => {
                         key={item.id}
                         disablePadding
                         divider
+                        secondaryAction={
+                            <ButtonGroup variant="outlined" aria-label="outlined button group">
+                                {editMode === item.id ? <Button onClick={() => { setEditMode(NaN); editTodo(item.id, editValue) }}><CheckIcon /></Button> :
+                                    <Button onClick={() => { setEditMode(item.id); setEditValue(item.title) }}><EditIcon /></Button>}
+                                <Button onClick={() => removeTodo(item.id)}><DeleteForeverIcon sx={{ color: "red" }} /></Button>
+                            </ButtonGroup>
+                        }
                         >
                         {editMode === item.id ?
                             <TextField
@@ -46,11 +53,6 @@ const TodoList: React.FC<toDos> = (props: toDos) => {
                                 primary={<Typography sx={{ fontSize: '1.3rem' }}>{item.title}</Typography>} />
                         </ListItemButton>
                         }
-                        <ButtonGroup variant="outlined" aria-label="outlined button group">
-                            {editMode === item.id ? <Button onClick={() => { setEditMode(NaN); editTodo(item.id, editValue) }}><CheckIcon /></Button> :
-                                <Button onClick={() => { setEditMode(item.id); setEditValue(item.title) }}><EditIcon /></Button>}
-                            <Button onClick={() => removeTodo(item.id)}><DeleteForeverIcon sx={{color: "red"}}/></Button>
-                        </ButtonGroup>
                     </ListItem>
                 );
             }) : null : null}
