@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
-import { Backdrop, CircularProgress, Container } from '@mui/material';
+import { Container } from '@mui/material';
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, doc, deleteDoc, where, query, getDocs, updateDoc } from 'firebase/firestore';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
-
-import { ITodo } from '../types/types';
 
 import AppHeader from './AppHeader';
 import AppFooter from './AppFooter';
@@ -21,49 +17,12 @@ const firebaseConfig = {
 };
 
 const firebase = initializeApp(firebaseConfig);
-const data = getFirestore(firebase);
 
 const App: React.FC = () => {
   const [sort, setSort] = useState('');
-  const [values, loading] = useCollectionData(collection(data, 'todos'));
-
-  const completeTodo = async (id: number) => {
-    const q = query(collection(data, 'todos'), where("id", "==", id));
-    await getDocs(q)
-      .then(querySnapshot => querySnapshot.forEach((item) => updateDoc(doc(data, 'todos', querySnapshot.docs[0].id), { complete: !item.data().complete })));
-  }
-
-  const removeTodo = async (id: number) => {
-    const q = query(collection(data, 'todos'), where("id", "==", id));
-    await getDocs(q)
-      .then(querySnapshot => deleteDoc(doc(data, 'todos', querySnapshot.docs[0].id)));
-  }
-
-  const editTodo = async (id: number, value: string) => {
-    const q = query(collection(data, 'todos'), where("id", "==", id));
-    await getDocs(q)
-      .then(querySnapshot => updateDoc(doc(data, 'todos', querySnapshot.docs[0].id), {title: value}));
-  }
-
-  const onSort = (sort: string) => {
-    switch (sort) {
-      case 'active':
-        return values ? values.filter(item => !item.complete) as ITodo[] : null;
-      case 'done':
-        return values ? values.filter(item => item.complete) as ITodo[] : null;
-      default:
-        return values ? values.sort((a, b) => a.id - b.id) as ITodo[] : null;
-    }
-  }
 
   const sortAction = (value: string) => {
     setSort(value);
-  }
-
-  const visibleData = onSort(sort);
-
-  if (loading) {
-    return <Backdrop sx={{bgcolor: 'transparent'}} open={loading}><CircularProgress/></Backdrop>
   }
 
   return (
@@ -71,7 +30,7 @@ const App: React.FC = () => {
       <AppHeader />
       <Container>
         <AddTodo firebase={firebase}/>
-        <TodoList todos={visibleData} completeTodo={completeTodo} removeTodo={removeTodo} editTodo={editTodo} />
+        <TodoList firebase={firebase} sort={sort} />
       </Container>
       <AppFooter sortAction={sortAction} sort={sort} />
     </>

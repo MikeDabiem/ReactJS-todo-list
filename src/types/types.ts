@@ -11,10 +11,8 @@ export type addTodo = {
 }
 
 export type toDos = {
-    todos: ITodo[] | null;
-    completeTodo: (id: number) => void;
-    removeTodo: (id: number) => void;
-    editTodo: (id: number, value: string) => void;
+    firebase: FirebaseApp;
+    sort: string;
 }
 
 export type IButton = {

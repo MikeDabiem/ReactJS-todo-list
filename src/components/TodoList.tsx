@@ -1,14 +1,54 @@
-import { List, ListItem, ButtonGroup, ListItemButton, ListItemIcon, ListItemText, Checkbox, Button, Typography, TextField, Box } from "@mui/material";
+import { Backdrop, CircularProgress, List, ListItem, ButtonGroup, ListItemButton, ListItemIcon, ListItemText, Checkbox, Button, Typography, TextField, Box } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import { ITodo, toDos } from '../types/types';
 import { useState } from "react";
+import { getFirestore, query, collection, getDocs, updateDoc, deleteDoc, doc, where } from "firebase/firestore";
+import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 const TodoList: React.FC<toDos> = (props: toDos) => {
-    const { todos, completeTodo, removeTodo, editTodo } = props;
+    const { firebase, sort } = props;
     const [editMode, setEditMode] = useState(0);
     const [editValue, setEditValue] = useState('');
+    const data = getFirestore(firebase);
+    const [values, loading] = useCollectionData(collection(data, 'todos'));
+
+    const onSort = (sort: string) => {
+        switch (sort) {
+            case 'active':
+                return values ? values.filter(item => !item.complete) as ITodo[] : null;
+            case 'done':
+                return values ? values.filter(item => item.complete) as ITodo[] : null;
+            default:
+                return values ? values.sort((a, b) => a.id - b.id) as ITodo[] : null;
+        }
+    }
+
+    const todos = onSort(sort);
+
+    if (loading) {
+        return <Backdrop sx={{ bgcolor: 'transparent' }} open={loading}><CircularProgress /></Backdrop>
+    }
+
+
+    const completeTodo = async (id: number) => {
+        const q = query(collection(data, 'todos'), where("id", "==", id));
+        await getDocs(q)
+            .then(querySnapshot => querySnapshot.forEach((item) => updateDoc(doc(data, 'todos', querySnapshot.docs[0].id), { complete: !item.data().complete })));
+    }
+
+    const editTodo = async (id: number, value: string) => {
+        const q = query(collection(data, 'todos'), where("id", "==", id));
+        await getDocs(q)
+            .then(querySnapshot => updateDoc(doc(data, 'todos', querySnapshot.docs[0].id), { title: value }));
+    }
+
+    const removeTodo = async (id: number) => {
+        const q = query(collection(data, 'todos'), where("id", "==", id));
+        await getDocs(q)
+            .then(querySnapshot => deleteDoc(doc(data, 'todos', querySnapshot.docs[0].id)));
+    }
 
     return (
         <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
