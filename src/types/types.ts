@@ -1,3 +1,5 @@
+import { FirebaseApp } from "firebase/app";
+
 export type ITodo = {
     id: number,
     title: string,
@@ -5,7 +7,7 @@ export type ITodo = {
 }
 
 export type addTodo = {
-    addTodo: (toDoObj: ITodo) => void;
+    firebase: FirebaseApp;
 }
 
 export type toDos = {

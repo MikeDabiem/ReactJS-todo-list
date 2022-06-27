@@ -1,9 +1,11 @@
 import { Box, Button, TextField } from "@mui/material";
+import { getFirestore, addDoc, collection } from "firebase/firestore";
 import {useFormik} from 'formik';
 import * as yup from 'yup';
 import {ITodo, addTodo} from '../types/types';
 
 const AddTodo: React.FC<addTodo> = (props: addTodo) => {
+    const data = getFirestore(props.firebase);
 
     const formik = useFormik({
         initialValues: {
@@ -19,9 +21,17 @@ const AddTodo: React.FC<addTodo> = (props: addTodo) => {
 
     const submit = (values: ITodo): void => {
         values.id = Date.now();
-        props.addTodo(values);
+        addTodo(values);
         formik.resetForm();
         formik.initialValues.title = '';
+    }
+
+    const addTodo = async (toDoObj: ITodo) => {
+        try {
+            await addDoc(collection(data, 'todos'), { id: toDoObj.id, title: toDoObj.title, complete: toDoObj.complete })
+        } catch (e) {
+            console.error("Error adding document: ", e);
+        }
     }
 
     return(

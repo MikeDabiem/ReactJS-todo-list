@@ -27,14 +27,6 @@ const App: React.FC = () => {
   const [sort, setSort] = useState('');
   const [values, loading] = useCollectionData(collection(data, 'todos'));
 
-  const addTodo = async (toDoObj: ITodo) => {
-    try {
-      await addDoc(collection(data, 'todos'), {id: toDoObj.id, title: toDoObj.title, complete: toDoObj.complete})
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  }
-
   const completeTodo = async (id: number) => {
     const q = query(collection(data, 'todos'), where("id", "==", id));
     await getDocs(q)
@@ -78,7 +70,7 @@ const App: React.FC = () => {
     <>
       <AppHeader />
       <Container>
-        <AddTodo addTodo={addTodo}/>
+        <AddTodo firebase={firebase}/>
         <TodoList todos={visibleData} completeTodo={completeTodo} removeTodo={removeTodo} editTodo={editTodo} />
       </Container>
       <AppFooter sortAction={sortAction} sort={sort} />
