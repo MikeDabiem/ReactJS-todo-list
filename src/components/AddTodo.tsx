@@ -2,16 +2,23 @@ import { Box, Button, TextField } from "@mui/material";
 import { getFirestore, addDoc, collection } from "firebase/firestore";
 import {useFormik} from 'formik';
 import * as yup from 'yup';
+import { getAuth } from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+
 import {ITodo, addTodo} from '../types/types';
 
 const AddTodo: React.FC<addTodo> = (props: addTodo) => {
     const data = getFirestore(props.firebase);
+    const auth = getAuth(props.firebase);
+    const [user] = useAuthState(auth);
+    const userId = user ? user.uid : '';
 
     const formik = useFormik({
         initialValues: {
             id: 0,
             title: '',
-            complete: false
+            complete: false,
+            alarm: NaN
         },
         validationSchema: yup.object({
             title: yup.string().required('You must enter a value')
@@ -23,12 +30,11 @@ const AddTodo: React.FC<addTodo> = (props: addTodo) => {
         values.id = Date.now();
         addTodo(values);
         formik.resetForm();
-        formik.initialValues.title = '';
     }
 
     const addTodo = async (toDoObj: ITodo) => {
         try {
-            await addDoc(collection(data, 'todos'), { id: toDoObj.id, title: toDoObj.title, complete: toDoObj.complete })
+            await addDoc(collection(data, userId), { id: toDoObj.id, title: toDoObj.title, complete: toDoObj.complete, alarm: NaN })
         } catch (e) {
             console.error("Error adding document: ", e);
         }

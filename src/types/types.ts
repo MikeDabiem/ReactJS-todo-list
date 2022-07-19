@@ -3,7 +3,8 @@ import { FirebaseApp } from "firebase/app";
 export type ITodo = {
     id: number,
     title: string,
-    complete: boolean
+    complete: boolean,
+    alarm: number
 }
 
 export type addTodo = {
@@ -13,6 +14,7 @@ export type addTodo = {
 export type toDos = {
     firebase: FirebaseApp;
     sort: string;
+    smallScr: boolean;
 }
 
 export type IButton = {
@@ -23,4 +25,9 @@ export type IButton = {
 export type footerProps = {
     sortAction: (sortAction: string) => void;
     sort: string;
+    smallScr: boolean;
+}
+
+export type loginProps = {
+    firebase: FirebaseApp;
 }

@@ -10,10 +10,10 @@ const buttonsData: IButton[] = [
 const AppFooter: React.FC<footerProps> = (props: footerProps) => {
     const btns = buttonsData.map(({ name, action }) => {
             const active = action === props.sort ? "contained" : "outlined";
-            return <Button key={name} variant={active} onClick={() => props.sortAction(action)} sx={{ p: '.3rem 3rem' }}>{name}</Button>});
+        return <Button key={name} variant={active} onClick={() => props.sortAction(action)} sx={props.smallScr ? { p: '.3rem 2rem' } : { p: '.3rem 3rem' }}>{name}</Button>});
 
     return (
-        <footer style={{display: 'flex', justifyContent: 'center', position: 'fixed', bottom: '1rem', width: '100%'}}>
+        <footer style={{display: 'flex', justifyContent: 'center', position: 'fixed', bottom: 0, paddingBottom: '1rem', width: '100%', background: '#fff'}}>
             <ButtonGroup aria-label="outlined button group">
                 {btns}
             </ButtonGroup>
